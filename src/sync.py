@@ -42,8 +42,20 @@ def sync():
     )
     logger.info("Selected TimeTree calendar")
 
+    # Label colors are cosmetic: never let a label fetch failure break sync.
+    try:
+        labels = client.get_labels(calendar) or {}
+    except Exception:
+        logger.warning("Failed to fetch TimeTree labels; continuing without colors")
+        labels = {}
+    label_colors = {
+        str(label_id): info.get("color")
+        for label_id, info in labels.items()
+        if isinstance(info, dict)
+    }
+
     raw_events = client.get_events(calendar)
-    events = [Event.from_timetree(raw) for raw in raw_events]
+    events = [Event.from_timetree(raw, label_colors) for raw in raw_events]
     timetree_ids = {event.id for event in events}
 
     google = GoogleCalendarClient(
