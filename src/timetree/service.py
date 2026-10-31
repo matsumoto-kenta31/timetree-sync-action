@@ -33,3 +33,6 @@ class TimeTreeService:
 
     def get_events(self, calendar: Calendar):
         return calendar.get_events()
+
+    def get_labels(self, calendar: Calendar) -> dict:
+        return calendar.get_labels()
